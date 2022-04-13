@@ -1,0 +1,7 @@
+{
+    "name": "StackHPC Tox Workflow",
+    "description": "Tox workflow for linting and unit tests",
+    "filePatterns": [
+        "^tox.ini$"
+    ]
+}
