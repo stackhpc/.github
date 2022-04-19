@@ -1,0 +1,13 @@
+---
+name: Upstream Sync
+'on':
+  schedule:
+    - cron: "15 8 * * 1"
+jobs:
+  upstream-sync:
+    strategy:
+      matrix:
+        branch: [xena, wallaby, victoria]
+    uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
+    with:
+      branch: ${{ matrix.branch }}
