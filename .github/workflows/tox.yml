@@ -26,4 +26,3 @@ jobs:
           run: pip install tox
         - name: Run Tox ${{ matrix.environment }} 🧪
           run: tox -e ${{ matrix.environment }}
-
