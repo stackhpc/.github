@@ -8,14 +8,14 @@ jobs:
     name: Synchronise stackhpc/xena
     uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
     with:
-      branch: xena
+      release-series: xena
   synchronise-wallaby:
     name: Synchronise stackhpc/wallaby
     uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
     with:
-      branch: wallaby
+      release-series: wallaby
   synchronise-victoria:
     name: Synchronise stackhpc/victoria
     uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
     with:
-      branch: victoria
+      release-series: victoria
