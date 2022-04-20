@@ -69,14 +69,14 @@ jobs:
             if(${{ steps.check-if-ahead.outputs.result }} == true) {
               const { repo, owner } = context.repo;
               const result = await github.rest.pulls.create({
-              title: 'Synchronise ${{ inputs.release-series }} with ${{ steps.branch-name.outputs.result }}',
-              owner,
-              repo,
-              head: '${{ steps.branch-name.outputs.result }}',
-              base: '${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }}',
-              maintainer_can_modify: false,
-              body: [
-                'The changes from ${{ env.upstream-prefix }}/${{ inputs.release-series }} have been included in this automated PR'
-              ].join('\n')
-            });
+                title: 'Synchronise ${{ inputs.release-series }} with ${{ steps.branch-name.outputs.result }}',
+                owner,
+                repo,
+                head: '${{ steps.branch-name.outputs.result }}',
+                base: '${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }}',
+                maintainer_can_modify: false,
+                body: [
+                  'The changes from ${{ env.upstream-prefix }}/${{ inputs.release-series }} have been included in this automated PR'
+                ].join('\n')
+              });
             }
