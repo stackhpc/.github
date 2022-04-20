@@ -3,6 +3,7 @@ name: Upstream Sync
 'on':
   schedule:
     - cron: "15 8 * * 1"
+  workflow_dispatch:
 jobs:
   synchronise-xena:
     name: Synchronise stackhpc/xena
