@@ -1,0 +1,88 @@
+---
+name: Upstream Sync Workflow
+'on':
+  workflow_call:
+    inputs:
+      release-series:
+        description: "OpenStack release series you wish to sync against, for example; xena, wallaby or victoria"
+        required: true
+        type: string
+jobs:
+  upstream-sync:
+    runs-on: ubuntu-20.04
+    env:
+      downstream-prefix: stackhpc
+      upstream-prefix: openstack:stable
+    steps:
+      - name: Check if ${{ format('{0}/{1}', env.upstream-prefix, inputs.release-series) }} is ahead of ${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }}
+        uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
+        id: check-if-ahead
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const result = await github.rest.repos.compareCommits({
+              owner,
+              repo,
+              head: '${{ format('{0}/{1}', env.upstream-prefix, inputs.release-series) }}',
+              base: '${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }}',
+            });
+            return result.data['ahead_by'] > 0 ? 'true' : 'false';
+          result-encoding: string
+      - name: Get upstream SHA
+        uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
+        id: get-upstream-sha
+        with:
+          script: |
+            if(${{ steps.check-if-ahead.outputs.result }} == true) {
+              const { repo, owner } = context.repo;
+              const result = await github.rest.repos.getCommit({
+                owner: '${{ format('openstack') }}',
+                repo: repo,
+                ref: '${{ format('{0}/{1}', 'stable', inputs.release-series) }}',
+              });
+              return result.data['sha'];
+            }
+          result-encoding: string
+      - name: Create copy of upstream branch
+        uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
+        id: branch-name
+        with:
+          script: |
+            if(${{ steps.check-if-ahead.outputs.result }} == true) {
+              const { repo, owner } = context.repo;
+              const date = new Date();
+              const prDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
+              const branchName = '${{ format('upstream-{0}-', inputs.release-series) }}' + prDate;
+              const result = await github.rest.git.createRef({
+                owner,
+                repo,
+                ref: 'refs/heads/' + branchName,
+                sha: '${{ steps.get-upstream-sha.outputs.result }}',
+              });
+              return branchName;
+            }
+          result-encoding: string
+      - name: Create PR ${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }} with ${{ steps.branch-name.outputs.result }}
+        uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
+        with:
+          script: |
+            if(${{ steps.check-if-ahead.outputs.result }} == true) {
+              const { repo, owner } = context.repo;
+              const result = await github.rest.pulls.create({
+                title: 'Synchronise ${{ inputs.release-series }} with ${{ steps.branch-name.outputs.result }}',
+                owner,
+                repo,
+                head: '${{ steps.branch-name.outputs.result }}',
+                base: '${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }}',
+                maintainer_can_modify: false,
+                body: [
+                  'The changes from ${{ env.upstream-prefix }}/${{ inputs.release-series }} have been included in this automated PR'
+                ].join('\n')
+              });
+              github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: result.data.number,
+                labels: ['automated', 'sync']
+              });
+            }
