@@ -1,0 +1,22 @@
+---
+name: Upstream Sync
+'on':
+  schedule:
+    - cron: "15 8 * * 1"
+  workflow_dispatch:
+jobs:
+  synchronise-xena:
+    name: Synchronise stackhpc/xena
+    uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
+    with:
+      release-series: xena
+  synchronise-wallaby:
+    name: Synchronise stackhpc/wallaby
+    uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
+    with:
+      release-series: wallaby
+  synchronise-victoria:
+    name: Synchronise stackhpc/victoria
+    uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
+    with:
+      release-series: victoria
