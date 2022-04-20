@@ -79,4 +79,10 @@ jobs:
                   'The changes from ${{ env.upstream-prefix }}/${{ inputs.release-series }} have been included in this automated PR'
                 ].join('\n')
               });
+              github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: result.data.number,
+                labels: ['automated', 'sync']
+              });
             }
