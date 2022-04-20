@@ -1,4 +1,7 @@
 {
     "name": "StackHPC Sync With OpenStack Upstream",
-    "description": "Synchronise with the upstream OpenStack repository against specified releases"
+    "description": "Synchronise with the upstream OpenStack repository against specified releases",
+    "filePatterns": [
+        "^.gitreview$"
+    ]
 }
