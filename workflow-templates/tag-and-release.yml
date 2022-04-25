@@ -1,0 +1,11 @@
+---
+name: Tag & Release
+'on':
+  push:
+    branches:
+      - "stackhpc/xena"
+      - "stackhpc/wallaby"
+      - "stackhpc/victoria"
+jobs:
+  tag-and-release:
+    uses: stackhpc/.github/.github/workflows/tag-and-release.yml@main
