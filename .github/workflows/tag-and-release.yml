@@ -6,6 +6,7 @@ name: Tag & Release
       - "stackhpc/xena"
       - "stackhpc/wallaby"
       - "stackhpc/victoria"
+  workflow_dispatch:
 jobs:
   tag:
     runs-on: ubuntu-20.04
