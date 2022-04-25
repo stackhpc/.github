@@ -1,0 +1,4 @@
+{
+    "name": "StackHPC Tag & Release",
+    "description": "Tag any commit pushed to release series branches and publish a release"
+}
