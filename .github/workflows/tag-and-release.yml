@@ -1,11 +1,6 @@
 ---
 name: Tag & Release
 'on':
-  push:
-    branches:
-      - "stackhpc/xena"
-      - "stackhpc/wallaby"
-      - "stackhpc/victoria"
   workflow_call:
 jobs:
   tag:
