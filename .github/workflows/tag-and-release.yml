@@ -20,7 +20,9 @@ jobs:
       - name: Configure repository 🛠
         run: |
           git remote rename origin stackhpc &&
-          git remote add origin "https://github.com/openstack/$(basename $(pwd)).git" &&
+          git remote add origin "https://github.com/openstack/$(basename $(pwd)).git"
+      - name: Push upstream tags to downstream fork 🏷
+        run: |
           git fetch origin &&
           git push stackhpc --follow-tags
       - name: Github checkout 🛎 [${{ env.naming-things-is-hard-repository }}]
