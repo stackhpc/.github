@@ -22,7 +22,7 @@ jobs:
           git remote rename origin stackhpc &&
           git remote add origin "https://github.com/openstack/$(basename $(pwd)).git" &&
           git fetch origin &&
-          git push --follow-tags
+          git push stackhpc --follow-tags
       - name: Github checkout 🛎 [${{ env.naming-things-is-hard-repository }}]
         uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
         with:
