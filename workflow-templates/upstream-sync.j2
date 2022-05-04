@@ -1,0 +1,12 @@
+---
+name: Upstream Sync
+'on':
+  schedule:
+    - cron: "15 8 * * 1"
+  workflow_dispatch:
+jobs:{% for release in releases %}
+  synchronise-{{ release }}:
+    name: Synchronise {{release}}
+    uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
+    with:
+      releases-series: {{ release }}{% endfor %}
