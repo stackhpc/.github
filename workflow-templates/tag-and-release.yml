@@ -6,6 +6,8 @@ name: Tag & Release
       - "stackhpc/xena"
       - "stackhpc/wallaby"
       - "stackhpc/victoria"
+permissions:
+  contents: write
 jobs:
   tag-and-release:
     uses: stackhpc/.github/.github/workflows/tag-and-release.yml@main
