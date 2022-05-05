@@ -31,9 +31,9 @@ jobs:
       - name: Get upstream SHA
         uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
         id: get-upstream-sha
+        if: ${{ steps.check-if-ahead.outputs.result == 'true'}}
         with:
           script: |
-            if(${{ steps.check-if-ahead.outputs.result }} == true) {
               const { repo, owner } = context.repo;
               const result = await github.rest.repos.getCommit({
                 owner: '${{ format('openstack') }}',
@@ -41,14 +41,13 @@ jobs:
                 ref: '${{ format('{0}/{1}', 'stable', inputs.release-series) }}',
               });
               return result.data['sha'];
-            }
           result-encoding: string
       - name: Create copy of upstream branch
         uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
         id: branch-name
+        if: ${{ steps.check-if-ahead.outputs.result == 'true'}}
         with:
           script: |
-            if(${{ steps.check-if-ahead.outputs.result }} == true) {
               const { repo, owner } = context.repo;
               const date = new Date();
               const prDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
@@ -60,13 +59,12 @@ jobs:
                 sha: '${{ steps.get-upstream-sha.outputs.result }}',
               });
               return branchName;
-            }
           result-encoding: string
       - name: Create PR ${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }} with ${{ steps.branch-name.outputs.result }}
         uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
+        if: ${{ steps.check-if-ahead.outputs.result == 'true'}}
         with:
           script: |
-            if(${{ steps.check-if-ahead.outputs.result }} == true) {
               const { repo, owner } = context.repo;
               const result = await github.rest.pulls.create({
                 title: 'Synchronise ${{ inputs.release-series }} with ${{ steps.branch-name.outputs.result }}',
@@ -85,4 +83,3 @@ jobs:
                 issue_number: result.data.number,
                 labels: ['automated', 'sync']
               });
-            }
