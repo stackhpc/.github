@@ -4,6 +4,9 @@ name: Upstream Sync
   schedule:
     - cron: "15 8 * * 1"
   workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   synchronise-xena:
     name: Synchronise stackhpc/xena
