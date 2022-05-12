@@ -9,7 +9,7 @@ name: Upstream Sync Workflow
         type: string
 jobs:
   upstream-sync:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       downstream-prefix: stackhpc
       upstream-prefix: openstack:stable
