@@ -7,6 +7,10 @@ name: Upstream Sync Workflow
         description: 'The OpenStack release series you wish to sync against.'
         required: true
         type: string
+env:
+  GITHUB_TOKEN: ${{github.token}}
+  DOWNSTREAM_OWNER: stackhpc
+  UPSTREAM_OWNER: openstack
 jobs:
   upstream-sync:
     runs-on: ubuntu-latest
