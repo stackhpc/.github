@@ -2,7 +2,7 @@
 name: Upstream Sync
 'on':
   schedule:
-    - cron: "15 8 * * 1"
+    - cron: '15 8 * * 1'
   workflow_dispatch:
 permissions:
   contents: write
@@ -12,14 +12,14 @@ jobs:
     name: Synchronise stackhpc/xena
     uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
     with:
-      release-series: xena
+      release_series: xena
   synchronise-wallaby:
     name: Synchronise stackhpc/wallaby
     uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
     with:
-      release-series: wallaby
+      release_series: wallaby
   synchronise-victoria:
     name: Synchronise stackhpc/victoria
     uses: stackhpc/.github/.github/workflows/upstream-sync.yml@main
     with:
-      release-series: victoria
+      release_series: victoria

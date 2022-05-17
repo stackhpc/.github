@@ -3,86 +3,86 @@ name: Upstream Sync Workflow
 'on':
   workflow_call:
     inputs:
-      release-series:
-        description: "OpenStack release series you wish to sync against, for example; xena, wallaby or victoria"
+      release_series:
+        description: 'The OpenStack release series you wish to sync against.'
         required: true
         type: string
+env:
+  GITHUB_TOKEN: ${{github.token}}
+  DOWNSTREAM_OWNER: stackhpc
+  UPSTREAM_OWNER: openstack
 jobs:
   upstream-sync:
-    runs-on: ubuntu-20.04
-    env:
-      downstream-prefix: stackhpc
-      upstream-prefix: openstack:stable
+    runs-on: ubuntu-latest
     steps:
-      - name: Check if ${{ format('{0}/{1}', env.upstream-prefix, inputs.release-series) }} is ahead of ${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }}
-        uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
-        id: check-if-ahead
-        with:
-          script: |
-            const { repo, owner } = context.repo;
-            const result = await github.rest.repos.compareCommits({
-              owner,
-              repo,
-              head: '${{ format('{0}/{1}', env.upstream-prefix, inputs.release-series) }}',
-              base: '${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }}',
-            });
-            return result.data['ahead_by'] > 0 ? 'true' : 'false';
-          result-encoding: string
       - name: Get upstream SHA
-        uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
-        id: get-upstream-sha
-        with:
-          script: |
-            if(${{ steps.check-if-ahead.outputs.result }} == true) {
-              const { repo, owner } = context.repo;
-              const result = await github.rest.repos.getCommit({
-                owner: '${{ format('openstack') }}',
-                repo: repo,
-                ref: '${{ format('{0}/{1}', 'stable', inputs.release-series) }}',
-              });
-              return result.data['sha'];
-            }
-          result-encoding: string
-      - name: Create copy of upstream branch
-        uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
-        id: branch-name
-        with:
-          script: |
-            if(${{ steps.check-if-ahead.outputs.result }} == true) {
-              const { repo, owner } = context.repo;
-              const date = new Date();
-              const prDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
-              const branchName = '${{ format('upstream-{0}-', inputs.release-series) }}' + prDate;
-              const result = await github.rest.git.createRef({
-                owner,
-                repo,
-                ref: 'refs/heads/' + branchName,
-                sha: '${{ steps.get-upstream-sha.outputs.result }}',
-              });
-              return branchName;
-            }
-          result-encoding: string
-      - name: Create PR ${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }} with ${{ steps.branch-name.outputs.result }}
-        uses: actions/github-script@9ac08808f993958e9de277fe43a64532a609130e
-        with:
-          script: |
-            if(${{ steps.check-if-ahead.outputs.result }} == true) {
-              const { repo, owner } = context.repo;
-              const result = await github.rest.pulls.create({
-                title: 'Synchronise ${{ inputs.release-series }} with ${{ steps.branch-name.outputs.result }}',
-                owner,
-                repo,
-                head: '${{ steps.branch-name.outputs.result }}',
-                base: '${{ format('{0}/{1}', env.downstream-prefix, inputs.release-series) }}',
-                maintainer_can_modify: false,
-                body: [
-                  'The changes from ${{ env.upstream-prefix }}/${{ inputs.release-series }} have been included in this automated PR'
-                ].join('\n')
-              });
-              github.rest.issues.addLabels({
-                owner,
-                repo,
-                issue_number: result.data.number,
-                labels: ['automated', 'sync']
-              });
-            }
+        id: get_upstream_sha
+        run: |
+          upstream_sha=$(gh api \
+          -H "Accept: application/vnd.github.v3+json" \
+          "/repos/${{env.UPSTREAM_OWNER}}/$(basename $(pwd))/commits/stable/${{inputs.release_series}}" --jq ".sha")
+          echo "::set-output name=result::$upstream_sha"
+      - name: Check if downstream branch exists
+        id: check_if_downstream_branch_exists
+        run: |
+          api_path="/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))/branches/stackhpc/${{inputs.release_series}}"
+          response=$(gh api -H "Accept: application/vnd.github.v3+json" $api_path --silent --include) || true
+          if [[ "$response" =~ "HTTP/2.0 200 OK" ]]; then
+            echo "::set-output name=result::true"
+          elif [[ "$response" =~ "HTTP/2.0 404 Not Found" ]]; then
+            echo "::set-output name=result::false"
+          else
+            exit 1
+          fi
+      - name: Create missing downstream branch
+        if: steps.check_if_downstream_branch_exists.outputs.result == 'false'
+        run: |
+          gh api \
+          --method POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          "/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))/git/refs" \
+          -f ref='refs/heads/stackhpc/${{inputs.release_series}}' \
+          -f sha=${{steps.get_upstream_sha.outputs.result}}
+      - name: Check if upstream is ahead of downstream
+        if: steps.check_if_downstream_branch_exists.outputs.result == 'true'
+        id: check_if_ahead
+        run: |
+          ahead_by=$(gh api \
+          -H "Accept: application/vnd.github.v3+json" \
+          "/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))"\
+          "/compare/stackhpc/${{inputs.release_series}}..."\
+          "${{env.UPSTREAM_OWNER}}:stable/${{inputs.release_series}}" --jq '.ahead_by')
+          echo "::set-output name=result::$ahead_by"
+      - name: Create copy of the upstream branch
+        if: steps.check_if_ahead.outputs.result > 0
+        run: |
+          gh api \
+          --method POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          "/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))/git/refs" \
+          -f ref="refs/heads/stackhpc/${{inputs.release_series}}-$(date +%F)" \
+          -f sha=${{steps.get_upstream_sha.outputs.result}}
+      - name: Create a pull request
+        if: steps.check_if_ahead.outputs.result > 0
+        id: create_pull_request
+        run: |
+          pull_request_url=$(gh api \
+          --method POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          /repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))/pulls \
+          -f title="Synchronise ${{inputs.release_series}} with upstream" \
+          -f body="This PR contains a snapshot of ${{inputs.release_series}} from upstream." \
+          -f head="${{env.DOWNSTREAM_OWNER}}:stackhpc/${{inputs.release_series}}-$(date +%F)" \
+          -f base="stackhpc/${{inputs.release_series}}" --jq '.url')
+          echo "::set-output name=result::$(basename $pull_request_url)"
+      - name: Add labels to pull request
+        if: steps.check_if_ahead.outputs.result > 0
+        run: |
+          api_path="https://api.github.com/repos/${{env.DOWNSTREAM_OWNER}}\
+          /$(basename $(pwd))/issues/${{steps.create_pull_request.outputs.result}}/labels"
+          curl \
+          -X POST \
+          -H "Authorization: token ${{env.GITHUB_TOKEN}}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          $api_path \
+          -d '{"labels":["automated","synchronisation"]}'
