@@ -71,7 +71,7 @@ jobs:
           -f title="Synchronise ${{inputs.release_series}} with upstream" \
           -f body="This PR contains a snapshot of ${{inputs.release_series}} from upstream." \
           -f head="${{env.DOWNSTREAM_OWNER}}:stackhpc/${{inputs.release_series}}-$(date +%F)" \
-          -f base="stackhpc/${{inputs.release_series}}" | jq -r '.url')
+          -f base="stackhpc/${{inputs.release_series}}" --jq '.url')
           echo "::set-output name=result::$(basename $pull_request_url)"
       - name: Add labels to pull request
         if: steps.check_if_ahead.outputs.result > 0
