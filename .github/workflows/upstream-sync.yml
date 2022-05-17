@@ -29,8 +29,10 @@ jobs:
           response=$(gh api -H "Accept: application/vnd.github.v3+json" $api_path --silent --include) || true
           if [[ "$response" =~ "HTTP/2.0 200 OK" ]]; then
             echo "::set-output name=result::true"
-          else
+          elif [[ "$response" =~ "HTTP/2.0 404 Not Found" ]]; then
             echo "::set-output name=result::false"
+          else
+            exit 1
           fi
       - name: Create missing downstream branch
         if: steps.check_if_downstream_branch_exists.outputs.result == 'false'
