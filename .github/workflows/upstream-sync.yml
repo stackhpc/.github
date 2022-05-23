@@ -60,7 +60,7 @@ jobs:
           --method POST \
           -H "Accept: application/vnd.github.v3+json" \
           "/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))/git/refs" \
-          -f ref="refs/heads/stackhpc/${{inputs.release_series}}-$(date +%F)" \
+          -f ref="refs/heads/upstream/${{inputs.release_series}}-$(date +%F)" \
           -f sha=${{steps.get_upstream_sha.outputs.result}}
       - name: Create a pull request
         if: steps.check_if_ahead.outputs.result > 0
@@ -72,7 +72,7 @@ jobs:
           /repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))/pulls \
           -f title="Synchronise ${{inputs.release_series}} with upstream" \
           -f body="This PR contains a snapshot of ${{inputs.release_series}} from upstream." \
-          -f head="${{env.DOWNSTREAM_OWNER}}:stackhpc/${{inputs.release_series}}-$(date +%F)" \
+          -f head="${{env.DOWNSTREAM_OWNER}}:upstream/${{inputs.release_series}}-$(date +%F)" \
           -f base="stackhpc/${{inputs.release_series}}" --jq '.url')
           echo "::set-output name=result::$(basename $pull_request_url)"
       - name: Add labels to pull request
