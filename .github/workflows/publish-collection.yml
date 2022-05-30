@@ -1,21 +1,14 @@
 name: Publish Collection
-
-# Controls when the action will run.
 on:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
-  workflow_dispatch:
-
+  workflow_call:
 jobs:
   galaxy:
     runs-on: ubuntu-latest
-
+    name: Publish Ansible Collection to Ansible Galaxy
     steps:
-      # Checks-out the repository under $GITHUB_WORKSPACE, so it's accessible to the job
-      - uses: actions/checkout@v2
-
-      - name: Build and publish a collection
-        uses: artis3n/ansible_galaxy_collection@v2
+      - name: Github Checkout 🛎
+        uses: actions/checkout@v2
+      - name: Publish Collection 🚀
+        uses: artis3n/ansible_galaxy_collection@1cbb23552f21d51abb2fee36284e1561ea960108
         with:
           api_key: '${{ secrets.GALAXY_API_KEY }}'
