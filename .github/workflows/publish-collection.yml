@@ -1,0 +1,14 @@
+name: Publish Collection
+on:
+  workflow_call:
+jobs:
+  galaxy:
+    runs-on: ubuntu-latest
+    name: Publish Ansible Collection to Ansible Galaxy
+    steps:
+      - name: Github Checkout 🛎
+        uses: actions/checkout@v2
+      - name: Publish Collection 🚀
+        uses: artis3n/ansible_galaxy_collection@1cbb23552f21d51abb2fee36284e1561ea960108
+        with:
+          api_key: '${{ secrets.GALAXY_API_KEY }}'
