@@ -2,6 +2,7 @@
 name: Tag & Release
 'on':
   workflow_call:
+concurrency: ${{ github.repository }}-tag-and-release
 jobs:
   tag:
     runs-on: ubuntu-20.04
