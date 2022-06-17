@@ -1,1 +1,14 @@
-publish-role.yml
+name: Publish Role
+on:
+  workflow_call:
+jobs:
+  galaxy:
+    runs-on: ubuntu-latest
+    name: Publish Ansible Role to Ansible Galaxy
+    steps:
+      - name: Github Checkout 🛎
+        uses: actions/checkout@v2
+      - name: Publish Role 🚀
+        uses: robertdebock/galaxy-action@2da9916b23b62d328af9c8814ad5973d68817a7e
+        with:
+          galaxy_api_key: ${{ secrets.GALAXY_API_KEY }}
