@@ -1,0 +1,12 @@
+name: Publish Role
+on:
+  workflow_call:
+jobs:
+  galaxy:
+    runs-on: ubuntu-latest
+    name: Publish Ansible Role to Ansible Galaxy
+    steps:
+      - name: Publish Role 🚀
+        run: ansible-galaxy import ${{ github.repository_owner }} $(basename ${{ github.repository }}) --api-key ${{ env.GALAXY_API_KEY }}
+        env: 
+          GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
