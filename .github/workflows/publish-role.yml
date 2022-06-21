@@ -1,6 +1,10 @@
 name: Publish Role
 on:
   workflow_call:
+    secrets:
+      GALAXY_API_KEY:
+        description: 'API key for Ansible Galaxy'
+        required: true
 jobs:
   galaxy:
     runs-on: ubuntu-latest
