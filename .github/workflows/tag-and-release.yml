@@ -2,6 +2,11 @@
 name: Tag & Release
 'on':
   workflow_call:
+    inputs:
+      upstream:
+        description: Upstream repository URL
+        type: string
+        required: false
 concurrency: ${{ github.repository }}-tag-and-release
 jobs:
   tag:
@@ -16,8 +21,12 @@ jobs:
           fetch-depth: 0
       - name: Configure repository 🛠
         run: |
+          upstream="${{ inputs.upstream }}"
+          if [[ -z "$upstream" ]]; then
+            upstream="https://github.com/openstack/$(basename $(pwd)).git"
+          fi
           git remote rename origin stackhpc &&
-          git remote add origin "https://github.com/openstack/$(basename $(pwd)).git"
+          git remote add origin "$upstream"
       - name: Push upstream tags to downstream fork 🏷
         run: |
           git fetch origin &&
