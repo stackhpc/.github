@@ -22,6 +22,10 @@ jobs:
           uses: actions/setup-python@98f2ad02fd48d057ee3b4d4f66525b231c3e52b6
           with:
             python-version: ${{ matrix.python-version }}
+        - name: Install bindep 📦
+          run: pip install bindep
+        - name: Install missing packages 📦
+          run: test -f bindep.txt && sudo apt install $(bindep -b test)
         - name: Install Tox 📦
           run: pip install tox
         - name: Run Tox ${{ matrix.environment }} 🧪
