@@ -27,6 +27,6 @@ jobs:
         - name: Install missing packages 📦
           run: test -f bindep.txt && sudo apt install $(bindep -b test)
         - name: Install Tox 📦
-          run: pip install tox
+          run: pip install tox==3.*
         - name: Run Tox ${{ matrix.environment }} 🧪
           run: tox -e ${{ matrix.environment }}
