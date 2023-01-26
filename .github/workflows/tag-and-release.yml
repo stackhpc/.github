@@ -7,13 +7,32 @@ name: Tag & Release
         description: Upstream repository URL
         type: string
         required: false
-concurrency: ${{ github.repository }}-tag-and-release
 jobs:
+  turnstyle:
+    runs-on: ubuntu-20.04
+    name: Serialise runs of this workflow
+    permissions:
+      actions: read
+    steps:
+      # Concurrent runs of this workflow can fail due to conflicting changes in tags.
+      # The GitHub workflow concurrency option works to some degree, but only a
+      # single job can be queued concurrently, and older queued jobs get
+      # cancelled. This makes sense for a deployment, but not for a tagging
+      # workflow.
+      - name: Serialise runs of this workflow
+        uses: softprops/turnstyle@ca99add00ff0c9cbc697d22631d2992f377e5bd5
+        with:
+          continue-after-seconds: 180
+          poll-interval-seconds: 30
+          same-branch-only: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   tag:
     runs-on: ubuntu-20.04
     env:
       naming-things-is-hard-repository: stackhpc/naming-things-is-hard
     name: Automatic tagging for ${{ github.ref_name }} 🏷
+    needs: [turnstyle]
     steps:
       - name: Github checkout 🛎 [${{ github.repository }}]
         uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846
