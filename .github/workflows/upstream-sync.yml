@@ -21,16 +21,16 @@ jobs:
           upstream_sha=$(gh api \
           -H "Accept: application/vnd.github.v3+json" \
           "/repos/${{env.UPSTREAM_OWNER}}/$(basename $(pwd))/commits/stable/${{inputs.release_series}}" --jq ".sha")
-          echo "::set-output name=result::$upstream_sha"
+          echo "result=$upstream_sha" >> $GITHUB_OUTPUT
       - name: Check if downstream branch exists
         id: check_if_downstream_branch_exists
         run: |
           api_path="/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))/branches/stackhpc/${{inputs.release_series}}"
           response=$(gh api -H "Accept: application/vnd.github.v3+json" $api_path --silent --include) || true
           if [[ "$response" =~ "HTTP/2.0 200 OK" ]]; then
-            echo "::set-output name=result::true"
+            echo "result=true" >> $GITHUB_OUTPUT
           elif [[ "$response" =~ "HTTP/2.0 404 Not Found" ]]; then
-            echo "::set-output name=result::false"
+            echo "result=false" >> $GITHUB_OUTPUT
           else
             exit 1
           fi
@@ -52,7 +52,7 @@ jobs:
           "/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))"\
           "/compare/stackhpc/${{inputs.release_series}}..."\
           "${{env.UPSTREAM_OWNER}}:stable/${{inputs.release_series}}" --jq '.ahead_by')
-          echo "::set-output name=result::$ahead_by"
+          echo "result=$ahead_by" >> $GITHUB_OUTPUT
       - name: Create copy of the upstream branch
         if: steps.check_if_ahead.outputs.result > 0
         run: |
@@ -74,7 +74,7 @@ jobs:
           -f body="This PR contains a snapshot of ${{inputs.release_series}} from upstream." \
           -f head="${{env.DOWNSTREAM_OWNER}}:upstream/${{inputs.release_series}}-$(date +%F)" \
           -f base="stackhpc/${{inputs.release_series}}" --jq '.url')
-          echo "::set-output name=result::$(basename $pull_request_url)"
+          echo "result=$(basename $pull_request_url)" >> $GITHUB_OUTPUT
       - name: Add labels to pull request
         if: steps.check_if_ahead.outputs.result > 0
         run: |
