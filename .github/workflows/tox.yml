@@ -23,9 +23,19 @@ jobs:
           with:
             python-version: ${{ matrix.python-version }}
         - name: Install bindep 📦
-          run: pip install bindep
+          run: |
+            if [[ -f bindep.txt ]]; then
+                pip install bindep
+            else
+                echo "No bindep.txt"
+            fi
         - name: Install missing packages 📦
-          run: test -f bindep.txt && sudo apt install $(bindep -b test)
+          run: |
+            if [[ -f bindep.txt ]]; then
+                sudo apt install $(bindep -b test)
+            else
+                echo "No bindep.txt"
+            fi
         - name: Install Tox 📦
           run: pip install tox==3.*
         - name: Run Tox ${{ matrix.environment }} 🧪
