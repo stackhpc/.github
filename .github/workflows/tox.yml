@@ -7,21 +7,28 @@ jobs:
       runs-on: ubuntu-20.04
       strategy:
         matrix:
-          include:
-            - environment: py36
-              python-version: 3.6
-            - environment: py38
-              python-version: 3.8
-            - environment: pep8
-              python-version: 3.8
-      name: Tox ${{ matrix.environment }} with Python ${{ matrix.python-version }}
+          environment: [pep,py3]
+          python-minor-version: [6,8,10]
+          is-zed: 
+            - ${{ (github.base_ref == 'stackhpc/zed') || (github.ref == 'refs/heads/stackhpc/zed')  }}
+          exclude:
+            - environment: pep
+              python-minor-version: 6
+            - is-zed: true
+              python-minor-version: 6
+            - is-zed: true
+              environment: pep
+              python-minor-version: 8
+            - is-zed: false
+              python-minor-version: 10
+      name: Tox ${{ matrix.environment }} with Python 3.${{ matrix.python-minor-version }}
       steps:
         - name: Github Checkout 🛎
           uses: actions/checkout@v3
-        - name: Setup Python ${{ matrix.python-version }} 🐍
+        - name: Setup Python 3.${{ matrix.python-minor-version }} 🐍
           uses: actions/setup-python@v4
           with:
-            python-version: ${{ matrix.python-version }}
+            python-version: 3.${{ matrix.python-minor-version }}
         - name: Install bindep 📦
           run: |
             if [[ -f bindep.txt ]]; then
@@ -38,5 +45,9 @@ jobs:
             fi
         - name: Install Tox 📦
           run: pip install tox==3.*
-        - name: Run Tox ${{ matrix.environment }} 🧪
-          run: tox -e ${{ matrix.environment }}
+        - name: Run Tox pep8 🧪
+          run: tox -e pep8
+          if: ${{ matrix.environment == 'pep' }}
+        - name: Run Tox py3${{ matrix.python-minor-version }} 🧪
+          run: tox -e py3${{ matrix.python-minor-version }}
+          if: ${{ matrix.environment == 'py3' }}
