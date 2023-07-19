@@ -7,17 +7,17 @@ jobs:
       runs-on: ubuntu-20.04
       strategy:
         matrix:
-          environment: [pep,py3]
+          environment: [pep8,py3]
           python-minor-version: [6,8,10]
           is-zed: 
             - ${{ (github.base_ref == 'stackhpc/zed') || (github.ref == 'refs/heads/stackhpc/zed')  }}
           exclude:
-            - environment: pep
+            - environment: pep8
               python-minor-version: 6
             - is-zed: true
               python-minor-version: 6
             - is-zed: true
-              environment: pep
+              environment: pep8
               python-minor-version: 8
             - is-zed: false
               python-minor-version: 10
@@ -47,7 +47,7 @@ jobs:
           run: pip install tox==3.*
         - name: Run Tox pep8 🧪
           run: tox -e pep8
-          if: ${{ matrix.environment == 'pep' }}
+          if: ${{ matrix.environment == 'pep8' }}
         - name: Run Tox py3${{ matrix.python-minor-version }} 🧪
           run: tox -e py3${{ matrix.python-minor-version }}
           if: ${{ matrix.environment == 'py3' }}
