@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Assert workflow was triggered on a tag
         run: echo "You must trigger this workflow on a git tag" && exit -1
-        if: github.ref_type != "tag"
+        if: ${{ github.ref_name }} != "tag"
       - name: Github Checkout 🛎
         uses: actions/checkout@v3
       - name: Check git tag matches version in galaxy.yml
