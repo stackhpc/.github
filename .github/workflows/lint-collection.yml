@@ -55,6 +55,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          # https://github.com/yaml/pyyaml/issues/724
+          pip install "cython<3.0.0"
+          pip install --no-build-isolation pyyaml==5.4.1
           pip install ansible-core==${{ matrix.ansible }}.*
 
       - name: Running sanity tests
