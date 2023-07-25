@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Github Checkout 🛎
         uses: actions/checkout@v3
+      - name: Check git tag matches version in galaxy.yml
+        run: git tag --points-at HEAD | grep $(yq -r .version < galaxy.yml)
       - name: Build Collection 🛠
         run: ansible-galaxy collection build
       - name: Publish Collection 🚀
