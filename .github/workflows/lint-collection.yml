@@ -1,0 +1,56 @@
+---
+name: Ansible collection linters
+'on':
+  workflow_call:
+jobs:
+  lint:
+    name: Ansible ${{ matrix.ansible }} lint
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ansible:
+          - "2.12"
+          - "2.14"
+    steps:
+      # Checks-out the repository under $GITHUB_WORKSPACE, so it's accessible to the job
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core==${{ matrix.ansible }}.* 'ansible-lint==6.*'
+
+      - name: Linting code
+        run: |
+          ansible-lint -v --force-color
+
+  sanity:
+    name: Ansible ${{ matrix.ansible }} sanity
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ansible:
+          - "2.12"
+          - "2.14"
+    steps:
+      # Checks-out the repository under $GITHUB_WORKSPACE, so it's accessible to the job
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core==${{ matrix.ansible }}.*
+
+      - name: Running sanity tests
+        run: |
+          .github/workflows/collection-sanity.sh
