@@ -10,8 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Publish Ansible Collection to Ansible Galaxy
     steps:
+      - name: Assert workflow was triggered on a tag
+        run: echo "You must trigger this workflow on a git tag" && exit -1
+        if: github.ref_type != 'tag'
       - name: Github Checkout 🛎
         uses: actions/checkout@v3
+      - name: Check git tag matches version in galaxy.yml
+        run: echo "${{ github.ref_name }}" | grep $(yq -r .version < galaxy.yml)
       - name: Build Collection 🛠
         run: ansible-galaxy collection build
       - name: Publish Collection 🚀
