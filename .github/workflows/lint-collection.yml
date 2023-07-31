@@ -44,6 +44,8 @@ jobs:
     steps:
       # Checks-out the repository under $GITHUB_WORKSPACE, so it's accessible to the job
       - uses: actions/checkout@v3
+        with:
+          path: repo
 
       # Checkout utility scripts
       - uses: actions/checkout@v3
@@ -63,3 +65,4 @@ jobs:
       - name: Running sanity tests
         run: |
           $GITHUB_WORKSPACE/stackhpc-github/.github/workflows/collection-sanity.sh
+        working-directory: ${{ github.workspace }}/repo
