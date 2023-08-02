@@ -2,6 +2,12 @@
 name: Ansible collection linters
 'on':
   workflow_call:
+    inputs:
+      lint_pip_dependencies:
+        description: Python package dependencies for ansible-lint
+        default: ""
+        type: string
+        required: false
 jobs:
   lint:
     name: Ansible ${{ matrix.ansible }} lint
@@ -23,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ansible-core==${{ matrix.ansible }}.* 'ansible-lint==6.*'
+          pip install ansible-core==${{ matrix.ansible }}.* 'ansible-lint==6.*' ${{ inputs.lint_pip_dependencies }}
 
       - name: Linting code
         run: |
