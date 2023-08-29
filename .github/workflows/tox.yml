@@ -9,17 +9,18 @@ jobs:
         matrix:
           environment: [pep8,py3]
           python-minor-version: [6,8,10]
-          is-zed: 
-            - ${{ (github.base_ref == 'stackhpc/zed') || (github.ref == 'refs/heads/stackhpc/zed')  }}
+          is-not-python36: |
+            (github.base_ref == 'stackhpc/zed') || (github.ref == 'refs/heads/stackhpc/zed') ||
+            (github.base_ref == 'stackhpc/2023.1') || (github.ref == 'refs/heads/stackhpc/2023.1')
           exclude:
             - environment: pep8
               python-minor-version: 6
-            - is-zed: true
+            - is-not-python36: true
               python-minor-version: 6
-            - is-zed: true
+            - is-not-python36: true
               environment: pep8
               python-minor-version: 8
-            - is-zed: false
+            - is-not-python36: false
               python-minor-version: 10
       name: Tox ${{ matrix.environment }} with Python 3.${{ matrix.python-minor-version }}
       steps:
