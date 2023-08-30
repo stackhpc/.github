@@ -9,9 +9,13 @@ jobs:
         matrix:
           environment: [pep8,py3]
           python-minor-version: [6,8,10]
-          is-not-python36: |
-            (github.base_ref == 'stackhpc/zed') || (github.ref == 'refs/heads/stackhpc/zed') ||
-            (github.base_ref == 'stackhpc/2023.1') || (github.ref == 'refs/heads/stackhpc/2023.1')
+          is-not-python36:
+            - ${{
+                 (github.base_ref == 'stackhpc/zed') ||
+                 (github.ref == 'refs/heads/stackhpc/zed') ||
+                 (github.base_ref == 'stackhpc/2023.1') ||
+                 (github.ref == 'refs/heads/stackhpc/2023.1')
+               }}
           exclude:
             - environment: pep8
               python-minor-version: 6
