@@ -13,5 +13,7 @@ jobs:
       - name: Assert workflow was triggered on a tag
         run: echo "You must trigger this workflow on a git tag" && exit -1
         if: github.ref_type != 'tag'
+      # NOTE(mgoddard): We need to specify the tag via --branch, otherwise it
+      # defaults to importing the default branch.
       - name: Publish Role 🚀
-        run: ansible-galaxy import ${{ github.repository_owner }} $(basename ${{ github.repository }}) --api-key ${{ secrets.GALAXY_API_KEY }}
+        run: ansible-galaxy role import ${{ github.repository_owner }} $(basename ${{ github.repository }}) --api-key ${{ secrets.GALAXY_API_KEY }} --branch ${{ github.ref_name }}
