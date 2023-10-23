@@ -10,5 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Publish Ansible Role to Ansible Galaxy
     steps:
+      - name: Assert workflow was triggered on a tag
+        run: echo "You must trigger this workflow on a git tag" && exit -1
+        if: github.ref_type != 'tag'
       - name: Publish Role 🚀
         run: ansible-galaxy import ${{ github.repository_owner }} $(basename ${{ github.repository }}) --api-key ${{ secrets.GALAXY_API_KEY }}
