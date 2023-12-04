@@ -7,6 +7,11 @@ name: Upstream Sync Workflow
         description: 'The OpenStack release series you wish to sync against.'
         required: true
         type: string
+      branch_prefix:
+        description: 'The prefix of the upstream branch you want to sync against.'
+        required: false
+        type: string
+        default: stable
 env:
   GITHUB_TOKEN: ${{github.token}}
   DOWNSTREAM_OWNER: stackhpc
@@ -20,7 +25,7 @@ jobs:
         run: |
           upstream_sha=$(gh api \
           -H "Accept: application/vnd.github.v3+json" \
-          "/repos/${{env.UPSTREAM_OWNER}}/$(basename $(pwd))/commits/stable/${{inputs.release_series}}" --jq ".sha")
+          "/repos/${{env.UPSTREAM_OWNER}}/$(basename $(pwd))/commits/${{inputs.branch_prefix}}/${{inputs.release_series}}" --jq ".sha")
           echo "result=$upstream_sha" >> $GITHUB_OUTPUT
       - name: Check if downstream branch exists
         id: check_if_downstream_branch_exists
@@ -51,7 +56,7 @@ jobs:
           -H "Accept: application/vnd.github.v3+json" \
           "/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))"\
           "/compare/stackhpc/${{inputs.release_series}}..."\
-          "${{env.UPSTREAM_OWNER}}:stable/${{inputs.release_series}}" --jq '.ahead_by')
+          "${{env.UPSTREAM_OWNER}}:${{inputs.branch_prefix}}/${{inputs.release_series}}" --jq '.ahead_by')
           echo "result=$ahead_by" >> $GITHUB_OUTPUT
       - name: Create copy of the upstream branch
         if: steps.check_if_ahead.outputs.result > 0
