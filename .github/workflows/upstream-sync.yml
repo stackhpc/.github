@@ -12,6 +12,11 @@ name: Upstream Sync Workflow
         required: false
         type: string
         default: stable
+      fallback_branch_prefix:
+        description: 'The fallback prefix of the upstream branch you want to sync against.'
+        required: false
+        type: string
+        default: unmaintained
 env:
   GITHUB_TOKEN: ${{github.token}}
   DOWNSTREAM_OWNER: stackhpc
@@ -23,11 +28,38 @@ jobs:
       - name: Get upstream SHA
         id: get_upstream_sha
         run: |
-          upstream_sha=$(gh api \
-          -H "Accept: application/vnd.github.v3+json" \
-          "/repos/${{env.UPSTREAM_OWNER}}/$(basename $(pwd))/commits/${{inputs.branch_prefix}}/${{inputs.release_series}}" --jq ".sha")
+          set +e
+
+          function get_sha {
+            ref=$1
+            gh api \
+            -H "Accept: application/vnd.github.v3+json" \
+            "/repos/${{env.UPSTREAM_OWNER}}/$(basename $(pwd))/commits/${ref}" --jq ".sha"
+          }
+
+          upstream_ref="${{inputs.branch_prefix}}/${{inputs.release_series}}"
+          upstream_sha=$(get_sha $upstream_ref)
+          result=$?
+          if [[ $result -ne 0 ]] && [[ -n "${{inputs.fallback_branch_prefix}}" ]]; then
+            echo "Failed to get SHA using standard branch prefix. Trying fallback."
+            upstream_ref="${{inputs.fallback_branch_prefix}}/${{inputs.release_series}}"
+            upstream_sha=$(get_sha $upstream_ref)
+            result=$?
+          fi
+          if [[ $result -ne 0 ]]; then
+            echo "Failed to get SHA using standard or fallback branch prefixes. Checking for EOL tag."
+            upstream_ref="${{inputs.release_series}}-eol"
+            upstream_sha=$(get_sha $upstream_ref)
+            result=$?
+            if [[ $result -ne 0 ]]; then
+              echo "Unable to find EOL tag - failing"
+              exit 1
+            fi
+          fi
+          echo "upstream_ref=$upstream_ref" >> $GITHUB_OUTPUT
           echo "result=$upstream_sha" >> $GITHUB_OUTPUT
       - name: Check if downstream branch exists
+        if: steps.get_upstream_sha.outputs.result != ''
         id: check_if_downstream_branch_exists
         run: |
           api_path="/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))/branches/stackhpc/${{inputs.release_series}}"
@@ -56,7 +88,7 @@ jobs:
           -H "Accept: application/vnd.github.v3+json" \
           "/repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))"\
           "/compare/stackhpc/${{inputs.release_series}}..."\
-          "${{env.UPSTREAM_OWNER}}:${{inputs.branch_prefix}}/${{inputs.release_series}}" --jq '.ahead_by')
+          "${{env.UPSTREAM_OWNER}}:${{steps.get_upstream_sha.outputs.result}}" --jq '.ahead_by')
           echo "result=$ahead_by" >> $GITHUB_OUTPUT
       - name: Create copy of the upstream branch
         if: steps.check_if_ahead.outputs.result > 0
@@ -76,7 +108,7 @@ jobs:
           -H "Accept: application/vnd.github.v3+json" \
           /repos/${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))/pulls \
           -f title="Synchronise ${{inputs.release_series}} with upstream" \
-          -f body="This PR contains a snapshot of ${{inputs.release_series}} from upstream." \
+          -f body="This PR contains a snapshot of ${{inputs.release_series}} from upstream ${{steps.get_upstream_sha.outputs.upstream_ref}}." \
           -f head="${{env.DOWNSTREAM_OWNER}}:upstream/${{inputs.release_series}}-$(date +%F)" \
           -f base="stackhpc/${{inputs.release_series}}" --jq '.url')
           echo "result=$(basename $pull_request_url)" >> $GITHUB_OUTPUT
