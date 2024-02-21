@@ -14,7 +14,7 @@ jobs:
         run: echo "You must trigger this workflow on a git tag" && exit -1
         if: github.ref_type != 'tag'
       - name: Github Checkout 🛎
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Check git tag matches version in galaxy.yml
         run: echo "${{ github.ref_name }}" | grep $(yq -r .version < galaxy.yml)
       - name: Build Collection 🛠
