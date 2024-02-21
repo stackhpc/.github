@@ -35,7 +35,7 @@ jobs:
     needs: [turnstyle]
     steps:
       - name: Github checkout 🛎 [${{ github.repository }}]
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Configure repository 🛠
@@ -51,7 +51,7 @@ jobs:
           git fetch origin &&
           git push stackhpc --follow-tags
       - name: Github checkout 🛎 [${{ env.naming-things-is-hard-repository }}]
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ${{ env.naming-things-is-hard-repository }}
           path: naming-things-is-hard
@@ -63,7 +63,7 @@ jobs:
     name: Release newly generated tag 🏷
     steps:
       - name: Github checkout 🛎 [${{ github.repository }}]
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Get tag 🏷

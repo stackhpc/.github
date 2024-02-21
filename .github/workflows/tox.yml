@@ -29,9 +29,9 @@ jobs:
       name: Tox ${{ matrix.environment }} with Python 3.${{ matrix.python-minor-version }}
       steps:
         - name: Github Checkout 🛎
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
         - name: Setup Python 3.${{ matrix.python-minor-version }} 🐍
-          uses: actions/setup-python@v4
+          uses: actions/setup-python@v5
           with:
             python-version: 3.${{ matrix.python-minor-version }}
         - name: Install bindep 📦
