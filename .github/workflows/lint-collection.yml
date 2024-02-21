@@ -27,7 +27,7 @@ jobs:
       # Checks-out the repository under $GITHUB_WORKSPACE, so it's accessible to the job
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 
@@ -64,7 +64,7 @@ jobs:
           repository: stackhpc/.github
           path: stackhpc-github
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 
