@@ -14,7 +14,11 @@ jobs:
                  (github.base_ref == 'stackhpc/zed') ||
                  (github.ref == 'refs/heads/stackhpc/zed') ||
                  (github.base_ref == 'stackhpc/2023.1') ||
-                 (github.ref == 'refs/heads/stackhpc/2023.1')
+                 (github.ref == 'refs/heads/stackhpc/2023.1') ||
+                 (github.base_ref == 'stackhpc/2023.2') ||
+                 (github.ref == 'refs/heads/stackhpc/2023.2') ||
+                 (github.base_ref == 'stackhpc/2024.1') ||
+                 (github.ref == 'refs/heads/stackhpc/2024.1')
                }}
           exclude:
             - environment: pep8
