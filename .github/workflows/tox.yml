@@ -6,6 +6,7 @@ jobs:
   tox:
       runs-on: ubuntu-20.04
       strategy:
+        fail-fast: false
         matrix:
           environment: [pep8,py3]
           python-minor-version: [6,8,10]
