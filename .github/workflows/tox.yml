@@ -54,7 +54,7 @@ jobs:
                 echo "No bindep.txt"
             fi
         - name: Install Tox 📦
-          run: pip install tox==3.*
+          run: pip install tox
         - name: Run Tox pep8 🧪
           run: tox -e pep8
           if: ${{ matrix.environment == 'pep8' }}
