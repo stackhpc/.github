@@ -21,6 +21,12 @@ jobs:
                  (github.base_ref == 'stackhpc/2024.1') ||
                  (github.ref == 'refs/heads/stackhpc/2024.1')
                }}
+          is-not-python38:
+            - ${{
+                 (github.repository == 'stackhpc/kayobe') &&
+                 ((github.base_ref == 'stackhpc/2024.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2024.1'))
+               }}
           exclude:
             - environment: pep8
               python-minor-version: 6
@@ -31,6 +37,8 @@ jobs:
               python-minor-version: 8
             - is-not-python36: false
               python-minor-version: 10
+            - is-not-python38: true
+              python-minor-version: 8
       name: Tox ${{ matrix.environment }} with Python 3.${{ matrix.python-minor-version }}
       steps:
         - name: Github Checkout 🛎
