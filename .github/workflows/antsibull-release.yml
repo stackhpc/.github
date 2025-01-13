@@ -1,0 +1,35 @@
+---
+name: Update Antsibull changelogs for Ansible collection
+on:
+  workflow_call:
+    inputs:
+      galaxy_directory:
+        type: string
+        default: "."
+        description: Directory containing galaxy.yml, CHANGELOG.rst and the changelogs subdirectory
+    
+jobs:
+  check-and-update:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for galaxy version bumps
+        id: check_galaxy
+        run: |
+          set +e
+          git diff --unified=0 HEAD^1 HEAD ${{ inputs.galaxy_directory }}/galaxy.yml | grep -v "^@" | grep version
+          VERSION_CHANGED=$?
+          set -e
+          echo "version_changed=$VERSION_CHANGED" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push release with Antsibull
+        if: ${{ steps.check_galaxy.outputs.version_changed == '0' }}
+        run: |
+          pip install antsibull-changelog==0.31.1
+          antsibull-changelog release
+          git add CHANGELOG.rst changelogs
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "Updated changelogs"
+          git push
