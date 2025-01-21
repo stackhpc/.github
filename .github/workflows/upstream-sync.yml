@@ -52,8 +52,14 @@ jobs:
             upstream_sha=$(get_sha $upstream_ref)
             result=$?
             if [[ $result -ne 0 ]]; then
-              echo "Unable to find EOL tag - failing"
-              exit 1
+              echo "Unable to find EOL tag. Trying master branch"
+              upstream_ref="master"
+              upstream_sha=$(get_sha $upstream_ref)
+              result=$?
+              if [[ $result -ne 0 ]]; then
+                echo "Unable to find master branch - Failing"
+                exit 1
+              fi
             fi
           fi
           echo "upstream_ref=$upstream_ref" >> $GITHUB_OUTPUT
