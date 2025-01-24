@@ -25,6 +25,13 @@ jobs:
                  (github.base_ref == 'stackhpc/2024.1') ||
                  (github.ref == 'refs/heads/stackhpc/2024.1')
                }}
+          python312:
+            - ${{
+                 (github.base_ref == 'stackhpc/2025.1') ||
+                 (github.ref == 'refs/heads/stackhpc/2025.1') ||
+                 (github.base_ref == 'stackhpc/master') ||
+                 (github.ref == 'refs/heads/stackhpc/master')
+               }}
           repository:
             - ${{ github.repository }}
           include:
@@ -51,9 +58,20 @@ jobs:
             - python310: true
               environment: py3
               python-minor-version: 8
+            # Python 3.12
+            - python312: true
+              environment: pep8
+              python-minor-version: 12
+            - python312: true
+              environment: py3
+              python-minor-version: 12
+            - python312: true
+              environment: py3
+              python-minor-version: 10
           exclude:
             - python38: false
             - python310: false
+            - python312: false
             - python38: true
               repository: stackhpc/kayobe
 
