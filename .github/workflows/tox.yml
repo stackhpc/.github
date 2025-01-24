@@ -8,37 +8,55 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
-          environment: [pep8,py3]
-          python-minor-version: [6,8,10]
-          is-not-python36:
+          python38:
             - ${{
-                 (github.base_ref == 'stackhpc/zed') ||
-                 (github.ref == 'refs/heads/stackhpc/zed') ||
+                 (github.repository != 'stackhpc/kayobe') &&
+                 ((github.base_ref == 'stackhpc/wallaby') ||
+                 (github.ref == 'refs/heads/stackhpc/wallaby') ||
+                 (github.base_ref == 'stackhpc/xena') ||
+                 (github.ref == 'refs/heads/stackhpc/xena') ||
+                 (github.base_ref == 'stackhpc/yoga') ||
+                 (github.ref == 'refs/heads/stackhpc/yoga'))
+               }}
+          python310:
+            - ${{
                  (github.base_ref == 'stackhpc/2023.1') ||
                  (github.ref == 'refs/heads/stackhpc/2023.1') ||
-                 (github.base_ref == 'stackhpc/2023.2') ||
-                 (github.ref == 'refs/heads/stackhpc/2023.2') ||
                  (github.base_ref == 'stackhpc/2024.1') ||
                  (github.ref == 'refs/heads/stackhpc/2024.1')
                }}
-          is-not-python38:
-            - ${{
-                 (github.repository == 'stackhpc/kayobe') &&
-                 ((github.base_ref == 'stackhpc/2024.1') ||
-                  (github.ref == 'refs/heads/stackhpc/2024.1'))
-               }}
-          exclude:
-            - environment: pep8
-              python-minor-version: 6
-            - is-not-python36: true
-              python-minor-version: 6
-            - is-not-python36: true
+          repository:
+            - ${{ github.repository }}
+          include:
+            # Releases are tested with their main and previous Python versions
+            # Linting is only done with the main Python version.
+
+            # Python 3.8
+            - python38: true
               environment: pep8
               python-minor-version: 8
-            - is-not-python36: false
-              python-minor-version: 10
-            - is-not-python38: true
+            - python38: true
+              environment: py3
               python-minor-version: 8
+            - python38: true
+              environment: py3
+              python-minor-version: 6
+            # Python 3.10
+            - python310: true
+              environment: pep8
+              python-minor-version: 10
+            - python310: true
+              environment: py3
+              python-minor-version: 10
+            - python310: true
+              environment: py3
+              python-minor-version: 8
+          exclude:
+            - python38: false
+            - python310: false
+            - python38: true
+              repository: stackhpc/kayobe
+
       name: Tox ${{ matrix.environment }} with Python 3.${{ matrix.python-minor-version }}
       steps:
         - name: Github Checkout 🛎
