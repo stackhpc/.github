@@ -9,24 +9,40 @@ jobs:
         fail-fast: false
         matrix:
           environment: [pep8,py3]
-          python-minor-version: [6,8,10]
+          python-minor-version: [6,8,10,12]
           is-not-python36:
             - ${{
-                 (github.base_ref == 'stackhpc/zed') ||
-                 (github.ref == 'refs/heads/stackhpc/zed') ||
-                 (github.base_ref == 'stackhpc/2023.1') ||
-                 (github.ref == 'refs/heads/stackhpc/2023.1') ||
-                 (github.base_ref == 'stackhpc/2023.2') ||
-                 (github.ref == 'refs/heads/stackhpc/2023.2') ||
-                 (github.base_ref == 'stackhpc/2024.1') ||
-                 (github.ref == 'refs/heads/stackhpc/2024.1')
-               }}
+                  (github.base_ref == 'stackhpc/zed') ||
+                  (github.ref == 'refs/heads/stackhpc/zed') ||
+                  (github.base_ref == 'stackhpc/2023.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2023.1') ||
+                  (github.base_ref == 'stackhpc/2023.2') ||
+                  (github.ref == 'refs/heads/stackhpc/2023.2') ||
+                  (github.base_ref == 'stackhpc/2024.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2024.1') ||
+                  (github.base_ref == 'stackhpc/2025.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2025.1') ||
+                  (github.base_ref == 'stackhpc/master') ||
+                  (github.ref == 'refs/heads/stackhpc/master')
+                }}
           is-not-python38:
             - ${{
-                 (github.repository == 'stackhpc/kayobe') &&
-                 ((github.base_ref == 'stackhpc/2024.1') ||
-                  (github.ref == 'refs/heads/stackhpc/2024.1'))
-               }}
+                  (github.repository == 'stackhpc/kayobe') &&
+                  ((github.base_ref == 'stackhpc/2024.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2024.1') ||
+                  (github.base_ref == 'stackhpc/2025.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2025.1') ||
+                  (github.base_ref == 'stackhpc/master') ||
+                  (github.ref == 'refs/heads/stackhpc/master'))
+                }}
+          is-primarily-python312:
+            - ${{
+                  (github.repository == 'stackhpc/kayobe') &&
+                  ((github.base_ref == 'stackhpc/2025.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2025.1') ||
+                  (github.base_ref == 'stackhpc/master') ||
+                  (github.ref == 'refs/heads/stackhpc/master'))
+                }}
           exclude:
             - environment: pep8
               python-minor-version: 6
@@ -39,6 +55,12 @@ jobs:
               python-minor-version: 10
             - is-not-python38: true
               python-minor-version: 8
+            - is-primarily-python312: true
+              environment: pep8
+              python-minor-version: 10
+            - is-primarily-python312: false
+              python-minor-version: 12
+
       name: Tox ${{ matrix.environment }} with Python 3.${{ matrix.python-minor-version }}
       steps:
         - name: Github Checkout 🛎
