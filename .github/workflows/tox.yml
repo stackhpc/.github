@@ -58,6 +58,9 @@ jobs:
             - is-primarily-python312: true
               environment: pep8
               python-minor-version: 10
+            - is-primarily-python312: true
+              environment: py3
+              python-minor-version: 8
             - is-primarily-python312: false
               python-minor-version: 12
 
