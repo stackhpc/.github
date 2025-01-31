@@ -28,9 +28,8 @@ jobs:
           is-not-python38:
             - ${{
                   ((github.repository == 'stackhpc/kayobe') &&
-                  (github.base_ref == 'stackhpc/2024.1')) ||
-                  ((github.repository == 'stackhpc/kayobe') &&
-                  (github.ref == 'refs/heads/stackhpc/2024.1')) ||
+                  ((github.base_ref == 'stackhpc/2024.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2024.1'))) ||
                   (github.base_ref == 'stackhpc/2025.1') ||
                   (github.ref == 'refs/heads/stackhpc/2025.1') ||
                   (github.base_ref == 'stackhpc/master') ||
