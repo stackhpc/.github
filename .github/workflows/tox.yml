@@ -27,21 +27,20 @@ jobs:
                 }}
           is-not-python38:
             - ${{
-                  (github.repository == 'stackhpc/kayobe') &&
+                  ((github.repository == 'stackhpc/kayobe') &&
                   ((github.base_ref == 'stackhpc/2024.1') ||
-                  (github.ref == 'refs/heads/stackhpc/2024.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2024.1'))) ||
                   (github.base_ref == 'stackhpc/2025.1') ||
                   (github.ref == 'refs/heads/stackhpc/2025.1') ||
                   (github.base_ref == 'stackhpc/master') ||
-                  (github.ref == 'refs/heads/stackhpc/master'))
+                  (github.ref == 'refs/heads/stackhpc/master')
                 }}
           is-primarily-python312:
             - ${{
-                  (github.repository == 'stackhpc/kayobe') &&
-                  ((github.base_ref == 'stackhpc/2025.1') ||
+                  (github.base_ref == 'stackhpc/2025.1') ||
                   (github.ref == 'refs/heads/stackhpc/2025.1') ||
                   (github.base_ref == 'stackhpc/master') ||
-                  (github.ref == 'refs/heads/stackhpc/master'))
+                  (github.ref == 'refs/heads/stackhpc/master')
                 }}
           exclude:
             - environment: pep8
