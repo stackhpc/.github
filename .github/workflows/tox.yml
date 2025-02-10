@@ -78,7 +78,7 @@ jobs:
         - name: Install missing packages 📦
           run: |
             if [[ -f bindep.txt ]]; then
-                sudo apt install $(bindep -b test)
+                sudo apt update && sudo apt install $(bindep -b test)
             else
                 echo "No bindep.txt"
             fi
