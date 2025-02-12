@@ -9,7 +9,7 @@ name: Tag & Release
         required: false
 jobs:
   turnstyle:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     name: Serialise runs of this workflow
     permissions:
       actions: read
@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   tag:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       naming-things-is-hard-repository: stackhpc/naming-things-is-hard
     name: Automatic tagging for ${{ github.ref_name }} 🏷
@@ -59,7 +59,7 @@ jobs:
         run: naming-things-is-hard/os-downstream-tag.py --release $(basename $(git rev-parse --abbrev-ref HEAD))
   release:
     needs: [tag]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     name: Release newly generated tag 🏷
     steps:
       - name: Github checkout 🛎 [${{ github.repository }}]
