@@ -3,62 +3,95 @@ name: Tox Workflow
 'on':
   workflow_call:
 jobs:
-  tox:
-      runs-on: ubuntu-20.04
-      strategy:
-        fail-fast: false
-        matrix:
-          environment: [pep8,py3]
-          python-minor-version: [6,8,10,12]
-          is-not-python36:
-            - ${{
+
+  define-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      tox-matrix: ${{ steps.matrix.outputs.tox-matrix }}
+    steps:
+      - name: Define Tox matrix
+        id: matrix
+        env:
+          PY3_8: ${{
+                  (github.base_ref == 'stackhpc/yoga') ||
+                  (github.ref == 'refs/heads/stackhpc/yoga') ||
                   (github.base_ref == 'stackhpc/zed') ||
                   (github.ref == 'refs/heads/stackhpc/zed') ||
                   (github.base_ref == 'stackhpc/2023.1') ||
                   (github.ref == 'refs/heads/stackhpc/2023.1') ||
-                  (github.base_ref == 'stackhpc/2023.2') ||
-                  (github.ref == 'refs/heads/stackhpc/2023.2') ||
+                  (((github.base_ref == 'stackhpc/2024.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2024.1')) &&
+                  (github.repository != 'stackhpc/kayobe'))
+                  }}
+          PY3_10: ${{
+                  (github.base_ref == 'stackhpc/zed') ||
+                  (github.ref == 'refs/heads/stackhpc/zed') ||
+                  (github.base_ref == 'stackhpc/2023.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2023.1') ||
                   (github.base_ref == 'stackhpc/2024.1') ||
                   (github.ref == 'refs/heads/stackhpc/2024.1') ||
                   (github.base_ref == 'stackhpc/2025.1') ||
                   (github.ref == 'refs/heads/stackhpc/2025.1') ||
                   (github.base_ref == 'stackhpc/master') ||
                   (github.ref == 'refs/heads/stackhpc/master')
-                }}
-          is-not-python38:
-            - ${{
-                  ((github.repository == 'stackhpc/kayobe') &&
-                  ((github.base_ref == 'stackhpc/2024.1') ||
-                  (github.ref == 'refs/heads/stackhpc/2024.1'))) ||
+                  }}
+          PY3_12: ${{
                   (github.base_ref == 'stackhpc/2025.1') ||
                   (github.ref == 'refs/heads/stackhpc/2025.1') ||
                   (github.base_ref == 'stackhpc/master') ||
                   (github.ref == 'refs/heads/stackhpc/master')
-                }}
-          is-primarily-python312:
-            - ${{
+                  }}
+          PEP8_8: ${{
+                  (github.base_ref == 'stackhpc/yoga') ||
+                  (github.ref == 'refs/heads/stackhpc/yoga')
+                  }}
+          PEP8_10: ${{
+                  (github.base_ref == 'stackhpc/zed') ||
+                  (github.ref == 'refs/heads/stackhpc/zed') ||
+                  (github.base_ref == 'stackhpc/2023.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2023.1') ||
+                  (github.base_ref == 'stackhpc/2024.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2024.1')
+                  }}
+          PEP8_12: ${{
                   (github.base_ref == 'stackhpc/2025.1') ||
                   (github.ref == 'refs/heads/stackhpc/2025.1') ||
                   (github.base_ref == 'stackhpc/master') ||
                   (github.ref == 'refs/heads/stackhpc/master')
-                }}
-          exclude:
-            - environment: pep8
-              python-minor-version: 6
-            - is-not-python36: true
-              python-minor-version: 6
-            - is-not-python36: true
-              environment: pep8
-              python-minor-version: 8
-            - is-not-python36: false
-              python-minor-version: 10
-            - is-not-python38: true
-              python-minor-version: 8
-            - is-primarily-python312: true
-              environment: pep8
-              python-minor-version: 10
-            - is-primarily-python312: false
-              python-minor-version: 12
+                  }}
+        run: |
+          # Create a matrix based on the environment and Python minor version
+          output="["
+          if [[ $PY3_8 == 'true' ]]; then
+              output+="{'environment': 'py3', 'python-minor-version': 8},"
+          fi
+          if [[ $PY3_10 == 'true' ]]; then
+              output+="{'environment': 'py3', 'python-minor-version': 10},"
+          fi
+          if [[ $PY3_12 == 'true' ]]; then
+              output+="{'environment': 'py3', 'python-minor-version': 12},"
+          fi
+          if [[ $PEP8_8 == 'true' ]]; then
+              output+="{'environment': 'pep8', 'python-minor-version': 8},"
+          fi
+          if [[ $PEP8_10 == 'true' ]]; then
+              output+="{'environment': 'pep8', 'python-minor-version': 10},"
+          fi
+          if [[ $PEP8_12 == 'true' ]]; then
+              output+="{'environment': 'pep8', 'python-minor-version': 12},"
+          fi
+          # remove trailing comma
+          output="${output%,}"
+          output+="]"
+          echo "tox-matrix=$output" >> $GITHUB_OUTPUT
+         
+  tox:
+      runs-on: ubuntu-latest
+      needs: define-matrix
+      strategy:
+        fail-fast: false
+        matrix:
+          include: ${{ fromJSON(needs.define-matrix.outputs.tox-matrix) }}
 
       name: Tox ${{ matrix.environment }} with Python 3.${{ matrix.python-minor-version }}
       steps:
