@@ -2,18 +2,13 @@
 
 ## Reporting a Vulnerability
 
-Thank you for taking the time to improve StackHPC open sourcec projects.
+Thank you for taking the time to improve StackHPC open source projects.
 
-We take security issues seriously and appreciate your time and efforts in making 
-our open source projects safer through coordinated vulnerability disclosure.
+We take security issues seriously and appreciate your time and efforts in making
+our code safer through coordinated vulnerability disclosure.
 
-If you believe you have found a security vulnerability in this repository,
-please use the built-in **"Report a vulnerability"** feature to notify us privately:
-1. Navigate to the **Security** tab at the top of this repository.
-2. Click on the **"Report a vulnerability"** button.
-3. Fill out the form with details about the vulnerability and submit it.
-
-This ensures that only repository maintainers and authorized personnel can view the report.
+If you believe you have found a security vulnerability in any StackHPC repository,
+please use email secalert@stackhpc.com to notify us privately.
 
 ### What to Include in Your Report
 To help us address the issue effectively, please include:
@@ -23,10 +18,10 @@ To help us address the issue effectively, please include:
 - Suggestions for mitigation, if possible.
 
 ### Response Time
-We are committed to investigating and responding to reported vulnerabilities promptly. 
+We are committed to investigating and responding to reported vulnerabilities promptly.
 You can expect:
 - An acknowledgment of your report within 48 hours.
 - Updates as we progress on resolving the issue.
 - Notification when the issue is resolved.
 
-Again, thank you for helping us keep our projects as secure as possible.
+Thank you for helping us keep open source as secure as possible.
