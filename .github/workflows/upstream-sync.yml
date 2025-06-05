@@ -17,6 +17,10 @@ name: Upstream Sync Workflow
         required: false
         type: string
         default: unmaintained
+      upstream:
+        description: Upstream repository on GitHub (owner/repo)
+        type: string
+        required: false
 env:
   GITHUB_TOKEN: ${{github.token}}
   DOWNSTREAM_OWNER: stackhpc
@@ -32,29 +36,34 @@ jobs:
 
           function get_sha {
             ref=$1
+            upstream_repo=$2
             gh api \
             -H "Accept: application/vnd.github.v3+json" \
-            "/repos/${{env.UPSTREAM_OWNER}}/$(basename $(pwd))/commits/${ref}" --jq ".sha"
+            "/repos/${upstream_repo}/commits/${ref}" --jq ".sha"
           }
 
+          upstream="${{ inputs.upstream }}"
+          if [[ -z "$upstream" ]]; then
+            upstream="${{env.UPSTREAM_OWNER}}/$(basename $(pwd))"
+          fi
           upstream_ref="${{inputs.branch_prefix}}/${{inputs.release_series}}"
-          upstream_sha=$(get_sha $upstream_ref)
+          upstream_sha=$(get_sha $upstream_ref $upstream)
           result=$?
           if [[ $result -ne 0 ]] && [[ -n "${{inputs.fallback_branch_prefix}}" ]]; then
             echo "Failed to get SHA using standard branch prefix. Trying fallback."
             upstream_ref="${{inputs.fallback_branch_prefix}}/${{inputs.release_series}}"
-            upstream_sha=$(get_sha $upstream_ref)
+            upstream_sha=$(get_sha $upstream_ref $upstream)
             result=$?
           fi
           if [[ $result -ne 0 ]]; then
             echo "Failed to get SHA using standard or fallback branch prefixes. Checking for EOL tag."
             upstream_ref="${{inputs.release_series}}-eol"
-            upstream_sha=$(get_sha $upstream_ref)
+            upstream_sha=$(get_sha $upstream_ref $upstream)
             result=$?
             if [[ $result -ne 0 ]]; then
               echo "Unable to find EOL tag. Trying master branch"
               upstream_ref="master"
-              upstream_sha=$(get_sha $upstream_ref)
+              upstream_sha=$(get_sha $upstream_ref $upstream)
               result=$?
               if [[ $result -ne 0 ]]; then
                 echo "Unable to find master branch - Failing"
