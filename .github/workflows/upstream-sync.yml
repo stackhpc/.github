@@ -21,6 +21,11 @@ name: Upstream Sync Workflow
         description: Upstream repository on GitHub (owner/repo)
         type: string
         required: false
+      sync_tags:
+        description: 'Whether to synchronize tags from upstream'
+        required: false
+        type: boolean
+        default: true
 env:
   GITHUB_TOKEN: ${{github.token}}
   DOWNSTREAM_OWNER: stackhpc
@@ -138,3 +143,28 @@ jobs:
           -H "Accept: application/vnd.github.v3+json" \
           $api_path \
           -d '{"labels":["automated","synchronisation"]}'
+      - name: Sync tags from upstream to downstream
+        if: ${{ inputs.sync_tags }}
+        run: |
+          upstream="${{ inputs.upstream }}"
+          if [[ -z "$upstream" ]]; then
+            upstream="${{env.UPSTREAM_OWNER}}/$(basename $(pwd))"
+          fi
+          downstream_repo="${{env.DOWNSTREAM_OWNER}}/$(basename $(pwd))"
+          # Get all upstream tags
+          gh api --paginate \
+            "/repos/${upstream}/git/refs/tags" \
+            --jq '.[] | "\(.ref) \(.object.sha)"' | \
+          while read -r ref sha; do
+            echo "Checking tag: $ref"
+            # Check if tag exists in downstream
+            if gh api "/repos/${downstream_repo}/git/${ref}" &>/dev/null; then
+              echo "Tag already exists, skipping"
+            else
+              echo "Creating tag: $ref"
+              gh api --method POST \
+                "/repos/${downstream_repo}/git/refs" \
+                -f "ref=$ref" \
+                -f "sha=$sha"
+            fi
+          done
