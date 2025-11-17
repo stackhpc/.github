@@ -32,8 +32,10 @@ jobs:
                   (github.ref == 'refs/heads/stackhpc/2024.1') ||
                   (github.base_ref == 'stackhpc/2025.1') ||
                   (github.ref == 'refs/heads/stackhpc/2025.1') ||
-                  (github.base_ref == 'stackhpc/master') ||
-                  (github.ref == 'refs/heads/stackhpc/master')
+                  (((github.base_ref == 'stackhpc/master') ||
+                  (github.ref == 'refs/heads/stackhpc/master')) &&
+                  ((github.repository != 'stackhpc/kayobe') ||
+                  (github.repository != 'stackhpc/kolla-ansible')))
                   }}
           PY3_12: ${{
                   (github.base_ref == 'stackhpc/2025.1') ||
