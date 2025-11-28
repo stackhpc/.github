@@ -11,18 +11,17 @@ name: Ansible collection linters
 jobs:
   lint:
     name: Ansible ${{ matrix.ansible }} lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         include:
-          - ansible: "2.12"
-            # ansible-lint 6+ is not supported on Python 3.8.
-            ansible-lint: "5"
-            python: "3.8"
-          - ansible: "2.14"
-            ansible-lint: "6"
+          - ansible: "2.18"
+            ansible-lint: "24"
             python: "3.11"
+          - ansible: "2.20"
+            ansible-lint: "25"
+            python: "3.12"
     steps:
       # Checks-out the repository under $GITHUB_WORKSPACE, so it's accessible to the job
       - uses: actions/checkout@v4
@@ -42,15 +41,15 @@ jobs:
 
   sanity:
     name: Ansible ${{ matrix.ansible }} sanity
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         include:
-          - ansible: "2.12"
-            python: "3.8"
-          - ansible: "2.14"
+          - ansible: "2.18"
             python: "3.11"
+          - ansible: "2.20"
+            python: "3.12"
 
     steps:
       # Checks-out the repository under $GITHUB_WORKSPACE, so it's accessible to the job
