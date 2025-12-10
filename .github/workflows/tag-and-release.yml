@@ -54,6 +54,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ env.naming-things-is-hard-repository }}
+          ref: fetch-tags
           path: naming-things-is-hard
       - name: Run naming-things-is-hard/os-downstream-tag
         run: naming-things-is-hard/os-downstream-tag.py --release $(basename $(git rev-parse --abbrev-ref HEAD))
