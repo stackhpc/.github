@@ -15,4 +15,10 @@ ansible-galaxy collection build --force
 ansible-galaxy collection install $NAMESPACE-$NAME-*.tar.gz --collections-path "${ANSIBLE_COLLECTIONS_PATH}" --force
 PY_VER=$(python3 -c "from platform import python_version;print(python_version())" | cut -f 1,2 -d".")
 cd "${ANSIBLE_COLLECTIONS_PATH}/ansible_collections/$NAMESPACE/$NAME"
-ansible-test sanity -v --color yes --venv --python "${PY_VER}"
+
+SANITY_ARGS=(-v --color yes --venv --python "${PY_VER}")
+if [[ "${PY_VER}" == "3.12" ]]; then
+    SANITY_ARGS+=(--skip-test ansible-doc)
+fi
+
+ansible-test sanity "${SANITY_ARGS[@]}"

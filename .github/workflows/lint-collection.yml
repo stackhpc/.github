@@ -62,6 +62,7 @@ jobs:
         with:
           repository: stackhpc/.github
           path: stackhpc-github
+          ref: ansible-collection-pulp
 
       - uses: actions/setup-python@v5
         with:
