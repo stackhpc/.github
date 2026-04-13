@@ -20,7 +20,7 @@ jobs:
       # cancelled. This makes sense for a deployment, but not for a tagging
       # workflow.
       - name: Serialise runs of this workflow
-        uses: softprops/turnstyle@ca99add00ff0c9cbc697d22631d2992f377e5bd5
+        uses: softprops/turnstyle@e565d2d86403c5d23533937e95980570545e5586 # v3.2.3
         with:
           continue-after-seconds: 180
           poll-interval-seconds: 30
