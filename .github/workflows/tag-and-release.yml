@@ -72,9 +72,19 @@ jobs:
       - name: Generate release notes 📝
         run: git log --pretty="%h %s" $(git describe --tags --abbrev=0)...$(git describe --tags --abbrev=0 $(git describe --tags --abbrev=0)^) > changelog.txt
       - name: Publish release 🚀
-        uses: softprops/action-gh-release@d4e8205d7e959a9107da6396278b2f1f07af0f9b
-        with:
-          tag_name: ${{ steps.commit-tag.outputs.value }}
-          body_path: ${{ github.workspace }}/changelog.txt
-          files: |
-            LICENSE
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ steps.commit-tag.outputs.value }}"
+          
+          # Fail if release already exists
+          if gh release view "$TAG_NAME" > /dev/null 2>&1; then
+            echo "Release for $TAG_NAME already exists. Releases are immutable."
+            exit 1
+          else
+            echo "Creating release for $TAG_NAME"
+            gh release create "$TAG_NAME" \
+              --title "$TAG_NAME" \
+              --notes-file changelog.txt \
+              LICENSE
+          fi
