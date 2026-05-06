@@ -20,7 +20,7 @@ jobs:
       # cancelled. This makes sense for a deployment, but not for a tagging
       # workflow.
       - name: Serialise runs of this workflow
-        uses: softprops/turnstyle@ca99add00ff0c9cbc697d22631d2992f377e5bd5
+        uses: softprops/turnstyle@e565d2d86403c5d23533937e95980570545e5586 # v3.2.3
         with:
           continue-after-seconds: 180
           poll-interval-seconds: 30
@@ -35,7 +35,7 @@ jobs:
     needs: [turnstyle]
     steps:
       - name: Github checkout 🛎 [${{ github.repository }}]
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Configure repository 🛠
@@ -51,7 +51,7 @@ jobs:
           git fetch origin &&
           git push stackhpc --follow-tags
       - name: Github checkout 🛎 [${{ env.naming-things-is-hard-repository }}]
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: ${{ env.naming-things-is-hard-repository }}
           path: naming-things-is-hard
@@ -63,7 +63,7 @@ jobs:
     name: Release newly generated tag 🏷
     steps:
       - name: Github checkout 🛎 [${{ github.repository }}]
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Get tag 🏷
