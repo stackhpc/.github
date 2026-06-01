@@ -37,6 +37,8 @@ jobs:
           PY3_12: ${{
                   (github.base_ref == 'stackhpc/2025.1') ||
                   (github.ref == 'refs/heads/stackhpc/2025.1') ||
+                  (github.base_ref == 'stackhpc/2026.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2026.1') ||
                   (github.base_ref == 'stackhpc/master') ||
                   (github.ref == 'refs/heads/stackhpc/master')
                   }}
@@ -55,6 +57,8 @@ jobs:
           PEP8_12: ${{
                   (github.base_ref == 'stackhpc/2025.1') ||
                   (github.ref == 'refs/heads/stackhpc/2025.1') ||
+                  (github.base_ref == 'stackhpc/2026.1') ||
+                  (github.ref == 'refs/heads/stackhpc/2026.1') ||
                   (github.base_ref == 'stackhpc/master') ||
                   (github.ref == 'refs/heads/stackhpc/master')
                   }}
