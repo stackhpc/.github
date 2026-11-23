@@ -5,7 +5,7 @@ name: Tox Workflow
 jobs:
 
   define-matrix:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     outputs:
       tox-matrix: ${{ steps.matrix.outputs.tox-matrix }}
     steps:
@@ -89,7 +89,7 @@ jobs:
           echo "tox-matrix=$output" >> $GITHUB_OUTPUT
          
   tox:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-24.04
       needs: define-matrix
       strategy:
         fail-fast: false
